@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Input;
 using com.mbpro.BGGExpUnowned.API;
+using com.mbpro.BGGExpUnowned.model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 
@@ -23,6 +24,7 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 		private void SearchButtonClicked()
 		{
 			username = username.Trim();
+			List<BoardGame> collection = _api.GetCollectionWithoutExpansions(username);
 			//TODO:
 			/*
 			 * retrieve collection without expansions
