@@ -14,11 +14,17 @@
 		</Grid.RowDefinitions>
 		<StackPanel Orientation="Horizontal">
 			<TextBlock Margin="5, 10, 5, 10">Username:</TextBlock>
-			<TextBox Width="100" Text="{Binding Path=username}"  Margin="5, 5, 5, 5"></TextBox>
+			<TextBox Width="100" Text="{Binding Path=Username}"  Margin="5, 5, 5, 5"></TextBox>
             <Button Margin="5, 5, 5, 5" Command="{Binding SearchCollectionCommand}">
 				<TextBlock Margin="5, 5, 5, 5">Search</TextBlock>
 			</Button>
 		</StackPanel>
-		<ListBox Grid.Row="1"></ListBox>
+        <ListBox Grid.Row="1" ItemsSource="{Binding Unowned}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 	</Grid>
 </Window>

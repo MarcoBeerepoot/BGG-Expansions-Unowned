@@ -6,13 +6,13 @@ namespace com.mbpro.BGGExpUnowned.model
 {
      public class BoardGame
     {
-        public BoardGame(long ID, string name)
+        public BoardGame(long ID, string Name)
         {
             this.ID = ID;
-            this.name = name;
+            this.Name = Name;
         }
 
         public long ID { get; set; }
-        public string name { get; set; }
+        public string Name { get; set; }
     }
 }

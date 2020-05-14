@@ -9,5 +9,6 @@ namespace com.mbpro.BGGExpUnowned.API
     {
         List<BoardGame> GetCollectionWithoutExpansions(string username);
         List<BoardGame> GetExpansionsOfGames(IEnumerable<long> IDs);
+        List<BoardGame> GetCollectionOnlyExpansions(string username);
     }
 }
