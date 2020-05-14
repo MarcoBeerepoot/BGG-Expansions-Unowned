@@ -8,5 +8,6 @@ namespace com.mbpro.BGGExpUnowned.API
     public interface IAPI
     {
         List<BoardGame> GetCollectionWithoutExpansions(string username);
+        List<BoardGame> GetExpansionsOfGames(IEnumerable<long> IDs);
     }
 }

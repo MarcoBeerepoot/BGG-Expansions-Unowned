@@ -19,7 +19,6 @@ namespace com.mbpro.BGGExpUnowned.API
             List<BoardGame> collection = new List<BoardGame>();
             for(int i = 0; i < items.Count; i++)
             {
-                Console.WriteLine("Test: " + items[i].InnerText);
                 XmlNode node = items[i];
                 long id = Convert.ToInt64(node.Attributes["objectid"].Value);
                 string name =  node.SelectSingleNode("name").InnerText;
@@ -28,6 +27,31 @@ namespace com.mbpro.BGGExpUnowned.API
             }
             //TODO Add retries if status is 202. Add failure detection for everything else. 
             return collection;
+        }
+
+        public List<BoardGame> GetExpansionsOfGames(IEnumerable<long> IDs)
+        {
+            String ids = String.Join(",", IDs);
+
+            //TODO test this with a big collection. Need to split up?
+
+            XmlDocument xDoc = new XmlDocument();
+            xDoc.Load(API_URL + "thing?id=" + ids);
+            XmlNodeList links = xDoc.GetElementsByTagName("link");
+            List<BoardGame> expansions = new List<BoardGame>();
+            for (int i = 0; i < links.Count; i++)
+            {
+                XmlNode node = links[i];
+                if (!node.Attributes["type"].Value.Equals("boardgameexpansion"))
+                {
+                    continue;
+                }
+                long id = Convert.ToInt64(node.Attributes["id"].Value);
+                string name = node.Attributes["value"].Value;
+
+                expansions.Add(new BoardGame(id, name));
+            }
+            return expansions;
         }
     }
 }
