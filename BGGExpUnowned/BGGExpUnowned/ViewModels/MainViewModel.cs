@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using com.mbpro.BGGExpUnowned.API;
 using com.mbpro.BGGExpUnowned.model;
@@ -10,30 +12,48 @@ using GalaSoft.MvvmLight.Command;
 
 namespace com.mbpro.BGGExpUnowned.ViewModels
 {
-    class MainViewModel : ViewModelBase
+    class MainViewModel : ViewModelBase, INotifyPropertyChanged
     {
 		public ICommand SearchCollectionCommand { get;}
 		
 		private IAPI _api;
 		public string Username { get; set; }
 
-		public ObservableCollection<BoardGame> Unowned { get; set; }
-		private bool _isBusySearching = false;
+		public ObservableCollection<BoardGame> Unowned { get;}
+		private bool enableSearchButton = true;
+		public bool EnableSearchButton
+		{
+			get
+			{
+				return this.enableSearchButton;
+			}
+			set
+			{
+				this.enableSearchButton = value;
+				RaisePropertyChanged("EnableSearchButton");
+			}
+		}
 
 		public MainViewModel(IAPI api)
         {
            _api = api;
-			SearchCollectionCommand = new RelayCommand(SearchButtonClicked, CanSearch);
+			SearchCollectionCommand = new RelayCommand(SearchButtonClicked);
 			Unowned = new ObservableCollection<BoardGame>();
 		}
 
-		private bool CanSearch()
+		private async void SearchButtonClicked()
 		{
-			return !_isBusySearching;
+			EnableSearchButton = false;
+			await Task.Run(() => Search()).ConfigureAwait(false);
+			EnableSearchButton = true;
 		}
-		private void SearchButtonClicked()
+		
+		private void Search()
 		{
-			_isBusySearching = true;
+			Application.Current.Dispatcher.Invoke(() =>
+			{
+				Unowned.Clear();
+			});
 			Username = Username.Trim();
 			List<BoardGame> collection = _api.GetCollectionWithoutExpansions(Username);
 			Dictionary<long, BoardGame> collectionFiltered = ConvertToDictionary(collection);
@@ -47,15 +67,14 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 			{
 				if (!collectionFiltered.ContainsKey(expansion.ID))
 				{
-					Unowned.Add(expansion);
+					Application.Current.Dispatcher.Invoke(() =>
+					{
+						Unowned.Add(expansion);
+					});
 				}
 			}
 			//TODO:
-			/*
-			 * Test disable search button while searching.
-			 * Is this done on the UI thread? If not use async or whatever I need.
-			 * 
-			 * Show results
+			/*		
 			 * Implement retries for http requests
 			 * Implement error detection for http requests
 			 * 
@@ -66,7 +85,6 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 			 * Create progress bar
 			 * 
 			 */
-			_isBusySearching = false;
 		}
 
 		private Dictionary<long, BoardGame> ConvertToDictionary(List<BoardGame> collection)

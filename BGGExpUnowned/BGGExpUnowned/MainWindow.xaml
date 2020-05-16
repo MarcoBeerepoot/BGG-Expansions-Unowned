@@ -15,7 +15,7 @@
 		<StackPanel Orientation="Horizontal">
 			<TextBlock Margin="5, 10, 5, 10">Username:</TextBlock>
 			<TextBox Width="100" Text="{Binding Path=Username}"  Margin="5, 5, 5, 5"></TextBox>
-            <Button Margin="5, 5, 5, 5" Command="{Binding SearchCollectionCommand}">
+            <Button Margin="5, 5, 5, 5" Command="{Binding SearchCollectionCommand}" IsEnabled="{Binding EnableSearchButton}">
 				<TextBlock Margin="5, 5, 5, 5">Search</TextBlock>
 			</Button>
 		</StackPanel>
