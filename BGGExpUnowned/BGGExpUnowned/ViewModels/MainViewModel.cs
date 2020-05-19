@@ -92,6 +92,7 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 			Dictionary<long, BoardGame> collectionFiltered = new Dictionary<long, BoardGame>();
 			foreach (BoardGame game in collection)
 			{
+				if (collectionFiltered.ContainsKey(game.ID)) continue;
 				collectionFiltered.Add(game.ID, game);
 
 			}
