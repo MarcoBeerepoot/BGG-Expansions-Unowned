@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Windows.Ink;
 using System.Xml;
+using com.mbpro.BGGExpUnowned.Extension;
 using com.mbpro.BGGExpUnowned.model;
 
 namespace com.mbpro.BGGExpUnowned.API
@@ -11,6 +13,7 @@ namespace com.mbpro.BGGExpUnowned.API
     {
         static readonly string BASE_URL = "https://boardgamegeek.com/";
         static readonly string API_URL = BASE_URL + "xmlapi2/";
+        static readonly int MAX_GAMES_BATCH_SIZE = 200; //Based on an id of max 6 digits for a board game + a comma to seperate I think 200 is a pretty safe bet. 
 
         public List<BoardGame> GetCollectionOnlyExpansions(string username)
         {
@@ -46,26 +49,27 @@ namespace com.mbpro.BGGExpUnowned.API
 
         public List<BoardGame> GetExpansionsOfGames(IEnumerable<long> IDs)
         {
-            String ids = String.Join(",", IDs);
-
-            //TODO test this with a big collection. Need to split up?
-
-            XmlDocument xDoc = new XmlDocument();
-            xDoc.Load(API_URL + "thing?id=" + ids);
-            XmlNodeList links = xDoc.GetElementsByTagName("link");
             List<BoardGame> expansions = new List<BoardGame>();
-            for (int i = 0; i < links.Count; i++)
+            foreach (var Batch in IDs.Batch(MAX_GAMES_BATCH_SIZE))
             {
-                XmlNode node = links[i];
-                if (!node.Attributes["type"].Value.Equals("boardgameexpansion"))
+                String ids = String.Join(",", Batch);
+                XmlDocument xDoc = new XmlDocument();
+                xDoc.Load(API_URL + "thing?id=" + ids);
+                XmlNodeList links = xDoc.GetElementsByTagName("link");
+                for (int i = 0; i < links.Count; i++)
                 {
-                    continue;
-                }
-                long id = Convert.ToInt64(node.Attributes["id"].Value);
-                string name = node.Attributes["value"].Value;
+                    XmlNode node = links[i];
+                    if (!node.Attributes["type"].Value.Equals("boardgameexpansion"))
+                    {
+                        continue;
+                    }
+                    long id = Convert.ToInt64(node.Attributes["id"].Value);
+                    string name = node.Attributes["value"].Value;
 
-                expansions.Add(new BoardGame(id, name));
+                    expansions.Add(new BoardGame(id, name));
+                }
             }
+            
             return expansions;
         }
 
