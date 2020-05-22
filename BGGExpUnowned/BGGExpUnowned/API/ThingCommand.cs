@@ -16,14 +16,8 @@ namespace com.mbpro.BGGExpUnowned.API
     {
 
         private static readonly int MAX_GAMES_BATCH_SIZE = 200; //Based on an id of max 6 digits for a board game + a comma to seperate I think 200 is a pretty safe bet. 
-        private readonly IEnumerable<long> IDs;
+        public IEnumerable<long> IDs { get; set; }
         private IEnumerable<long> CurrentBatch;
-
-        public ThingCommand(IEnumerable<long> iDs)
-        {
-            IDs = iDs;
-            Result = new List<BoardGame>();
-        }
 
         public override List<BoardGame> Execute()
         {

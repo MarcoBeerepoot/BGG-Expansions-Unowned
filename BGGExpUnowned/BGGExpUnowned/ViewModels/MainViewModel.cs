@@ -16,7 +16,7 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
     {
 		public ICommand SearchCollectionCommand { get;}
 		
-		private IAPI _api;
+		private readonly IAPI _api;
 		public string Username { get; set; }
 
 		public ObservableCollection<BoardGame> Unowned { get;}
@@ -83,6 +83,7 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 			 * Replace ListBox with sortable table?
 			 * Add link in the result so you can visit the game on BGG
 			 * Create progress bar
+			 * Tests
 			 * 
 			 */
 		}

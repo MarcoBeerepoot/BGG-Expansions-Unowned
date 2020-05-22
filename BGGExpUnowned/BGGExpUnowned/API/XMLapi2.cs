@@ -15,20 +15,21 @@ namespace com.mbpro.BGGExpUnowned.API
 
         public List<BoardGame> GetCollectionOnlyExpansions(string username)
         {
-            APICommand command = new CollectionCommand(username, false, true);//https://boardgamegeek.com/xmlapi2/collection?username=DraedGhawl&subtype=boardgameexpansion&own=1
+            //https://boardgamegeek.com/xmlapi2/collection?username=DraedGhawl&subtype=boardgameexpansion&own=1
+            APICommand command = new Builder<CollectionCommand>().With(c => c.Username = username).With(c => c.OnlyExpansions = true).Build();
             return command.Execute();
         }
 
         public List<BoardGame> GetCollectionWithoutExpansions(string username)
         {
             //https://boardgamegeek.com/xmlapi2/collection?username=DraedGhawl&excludesubtype=boardgameexpansion&own=1
-            APICommand command = new CollectionCommand(username, true, false);
+            APICommand command = new Builder<CollectionCommand>().With(c => c.Username = username).With(c => c.ExcludeExpansions = true).Build();
             return command.Execute();
         }
 
         public List<BoardGame> GetExpansionsOfGames(IEnumerable<long> IDs)
         {
-            APICommand command = new ThingCommand(IDs);
+            APICommand command = new Builder<ThingCommand>().With(c => c.IDs = IDs).Build();
             return command.Execute();
         }
 

@@ -14,15 +14,8 @@ namespace com.mbpro.BGGExpUnowned.API
     class CollectionCommand : APICommand
     {
         public string Username { get; set; }
-        private readonly bool ExcludeExpansions;
-        private readonly bool OnlyExpansions;
-
-        public CollectionCommand(string username, bool excludeExpansions, bool onlyExpansions)
-        {
-            Username = username;
-            ExcludeExpansions = excludeExpansions;
-            OnlyExpansions = onlyExpansions;
-        }
+        public bool ExcludeExpansions { get; set; } = false;
+        public bool OnlyExpansions { get; set; } = false;
 
         protected override bool Load()
         {
