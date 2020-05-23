@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using com.mbpro.BGGExpUnowned.Extension;
 using com.mbpro.BGGExpUnowned.model;
@@ -19,24 +20,17 @@ namespace com.mbpro.BGGExpUnowned.API
         public IEnumerable<long> IDs { get; set; }
         private IEnumerable<long> CurrentBatch;
 
-        public override List<BoardGame> Execute()
+        public async override Task<List<BoardGame>> ExecuteAsync()
         {
             foreach (var Batch in IDs.Batch(MAX_GAMES_BATCH_SIZE))
             {
                 CurrentBatch = Batch;
                 XDoc = new XmlDocument();
-                Load();
+                await LoadStreamFromUrlWithRetriesAsync(CreateURL());
                 Process();
-               
             }
 
             return Result;
-        }
-        protected override bool Load()
-        {
-            String ids = String.Join(",", CurrentBatch);
-            XDoc.Load(API_URL + "thing?id=" + ids);
-            return true;
         }
 
         protected override void Process()
@@ -54,6 +48,12 @@ namespace com.mbpro.BGGExpUnowned.API
 
                 Result.Add(new BoardGame(id, name));
             }
+        }
+
+        internal override string CreateURL()
+        {
+            String ids = String.Join(",", CurrentBatch);
+            return API_URL + "thing?id=" + ids;
         }
     }
 }

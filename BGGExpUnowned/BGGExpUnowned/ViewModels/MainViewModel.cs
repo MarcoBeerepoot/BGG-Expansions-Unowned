@@ -44,21 +44,21 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 		private async void SearchButtonClicked()
 		{
 			EnableSearchButton = false;
-			await Task.Run(() => Search()).ConfigureAwait(false);
+			await Task.Run(() => SearchAsync()).ConfigureAwait(false);
 			EnableSearchButton = true;
 		}
 		
-		private void Search()
+		private async Task SearchAsync()
 		{
 			Application.Current.Dispatcher.Invoke(() =>
 			{
 				Unowned.Clear();
 			});
 			Username = Username.Trim();
-			List<BoardGame> collection = _api.GetCollectionWithoutExpansions(Username);
+			List<BoardGame> collection = await _api.GetCollectionWithoutExpansionsAsync(Username);
 			Dictionary<long, BoardGame> collectionFiltered = ConvertToDictionary(collection);
-			List<BoardGame> allExpansions = _api.GetExpansionsOfGames(collectionFiltered.Keys);
-			Dictionary<long, BoardGame> expansionsOwned = ConvertToDictionary(_api.GetCollectionOnlyExpansions(Username));
+			List<BoardGame> allExpansions = await _api.GetExpansionsOfGamesAsync(collectionFiltered.Keys);
+			Dictionary<long, BoardGame> expansionsOwned = ConvertToDictionary(await _api.GetCollectionOnlyExpansionsAsync(Username));
 			foreach (KeyValuePair<long, BoardGame> game in expansionsOwned)
 			{
 				collectionFiltered[game.Key] = game.Value;
@@ -75,8 +75,6 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 			}
 			//TODO:
 			/*		
-			 * Implement retries for http requests
-			 * Implement error detection for http requests
 			 * 
 			 * Optional:
 			 * Add filter for everything on your wishlist (or other lists)
@@ -84,6 +82,13 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 			 * Add link in the result so you can visit the game on BGG
 			 * Create progress bar
 			 * Tests
+			 * Add logging
+			 * Check if username exists. (query collection api and check for message:
+			 * <errors>
+<error>
+<message>Invalid username specified</message>
+</error>
+</errors>
 			 * 
 			 */
 		}

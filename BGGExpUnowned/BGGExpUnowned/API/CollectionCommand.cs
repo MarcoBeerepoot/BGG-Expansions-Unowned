@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using com.mbpro.BGGExpUnowned.model;
 
@@ -17,12 +20,6 @@ namespace com.mbpro.BGGExpUnowned.API
         public bool ExcludeExpansions { get; set; } = false;
         public bool OnlyExpansions { get; set; } = false;
 
-        protected override bool Load()
-        {
-            XDoc.Load(CreateURL()); 
-            return true;
-        }
-
         protected override void Process()
         {
             //TODO add retries on everything other than 202.
@@ -37,7 +34,7 @@ namespace com.mbpro.BGGExpUnowned.API
             }
         }
 
-        private string CreateURL()
+        internal override string CreateURL()
         {
             StringBuilder sb = new StringBuilder(API_URL);
             sb.Append("collection?username=");
