@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using com.mbpro.BGGExpUnowned.API;
+using com.mbpro.BGGExpUnowned.ViewModels;
 
 namespace com.mbpro.BGGExpUnowned
 {
@@ -24,9 +25,13 @@ namespace com.mbpro.BGGExpUnowned
 		public MainWindow()
 		{
 			InitializeComponent();
+			(this.DataContext as MainViewModel).MessageBoxRequest += new EventHandler<MvvmMessageBoxEventArgs>(ProcessMessageBoxRequest);
 		}
 
-
+		void ProcessMessageBoxRequest(object sender, MvvmMessageBoxEventArgs e)
+		{
+			e.Show();
+		}
 		
 	}
 }

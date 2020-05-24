@@ -56,7 +56,7 @@ namespace com.mbpro.BGGExpUnowned.API
                     return success;
                 } else if(!response.StatusCode.Equals(HttpStatusCode.OK))
                 {
-                    throw new HttpRequestException("Request to BGG XML API failed with statuscode " + response.StatusCode);
+                    throw new BGGAPIException("Request to BGG XML API failed with statuscode " + response.StatusCode + ".");
                 }
 
                 using (Stream stream = await response.Content.ReadAsStreamAsync())

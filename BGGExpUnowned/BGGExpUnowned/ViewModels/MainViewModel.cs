@@ -21,6 +21,16 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 
 		public ObservableCollection<BoardGame> Unowned { get;}
 		private bool enableSearchButton = true;
+
+		public event EventHandler<MvvmMessageBoxEventArgs> MessageBoxRequest;
+		protected void MessageBox_Show(Action<MessageBoxResult> resultAction, string messageBoxText, string caption = "", MessageBoxButton button = MessageBoxButton.OK, MessageBoxImage icon = MessageBoxImage.None, MessageBoxResult defaultResult = MessageBoxResult.None, MessageBoxOptions options = MessageBoxOptions.None)
+		{
+			if (MessageBoxRequest != null)
+			{
+				MessageBoxRequest(this, new MvvmMessageBoxEventArgs(resultAction, messageBoxText, caption, button, icon, defaultResult, options));
+			}
+		}
+
 		public bool EnableSearchButton
 		{
 			get
@@ -55,23 +65,29 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 				Unowned.Clear();
 			});
 			Username = Username.Trim();
-			List<BoardGame> collection = await _api.GetCollectionWithoutExpansionsAsync(Username);
-			Dictionary<long, BoardGame> collectionFiltered = ConvertToDictionary(collection);
-			List<BoardGame> allExpansions = await _api.GetExpansionsOfGamesAsync(collectionFiltered.Keys);
-			Dictionary<long, BoardGame> expansionsOwned = ConvertToDictionary(await _api.GetCollectionOnlyExpansionsAsync(Username));
-			foreach (KeyValuePair<long, BoardGame> game in expansionsOwned)
+			try
 			{
-				collectionFiltered[game.Key] = game.Value;
-			}
-			foreach (BoardGame expansion in allExpansions)
-			{
-				if (!collectionFiltered.ContainsKey(expansion.ID))
+				List<BoardGame> collection = await _api.GetCollectionWithoutExpansionsAsync(Username);
+				Dictionary<long, BoardGame> collectionFiltered = ConvertToDictionary(collection);
+				List<BoardGame> allExpansions = await _api.GetExpansionsOfGamesAsync(collectionFiltered.Keys);
+				Dictionary<long, BoardGame> expansionsOwned = ConvertToDictionary(await _api.GetCollectionOnlyExpansionsAsync(Username));
+				foreach (KeyValuePair<long, BoardGame> game in expansionsOwned)
 				{
-					Application.Current.Dispatcher.Invoke(() =>
-					{
-						Unowned.Add(expansion);
-					});
+					collectionFiltered[game.Key] = game.Value;
 				}
+				foreach (BoardGame expansion in allExpansions)
+				{
+					if (!collectionFiltered.ContainsKey(expansion.ID))
+					{
+						Application.Current.Dispatcher.Invoke(() =>
+						{
+							Unowned.Add(expansion);
+						});
+					}
+				}
+			} catch (BGGAPIException e)
+			{
+				MessageBox_Show(null, e.Message + " Please try again later.", "Alert", System.Windows.MessageBoxButton.OK);
 			}
 			//TODO:
 			/*		
@@ -81,8 +97,10 @@ namespace com.mbpro.BGGExpUnowned.ViewModels
 			 * Replace ListBox with sortable table?
 			 * Add link in the result so you can visit the game on BGG
 			 * Create progress bar
-			 * Tests
+			 * Create automatic tests
+			 * Test if results are correct and complete.
 			 * Add logging
+			 * Handle no internet connection.
 			 * Check if username exists. (query collection api and check for message:
 			 * <errors>
 <error>
